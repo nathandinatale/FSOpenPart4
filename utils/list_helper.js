@@ -8,7 +8,6 @@ const totalLikes = (blogs) => {
 
 const favouriteBlog = (blogs) => {
   if (!blogs.length >= 1) return null;
-  console.log(blogs);
   const mostBlogLikes = Math.max(...blogs.map((blog) => blog.likes));
   const favBlog = blogs.find((blog) => blog.likes === mostBlogLikes);
   return {

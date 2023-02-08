@@ -25,4 +25,17 @@ app.use(express.json());
 
 app.use("/api/blogs", blogsRouter);
 
+process.on("SIGINT", () => {
+  mongoose.connection
+    .close()
+    .then(() => {
+      console.log("Mongoose connection closed");
+      process.exit();
+    })
+    .catch((error) => {
+      console.log("issue when closing mongoose connection", error);
+      process.exit();
+    });
+});
+
 module.exports = app;
