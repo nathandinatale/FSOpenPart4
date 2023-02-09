@@ -30,3 +30,22 @@ test("correct number of blogs are returned", async () => {
   const response = await api.get("/api/blogs");
   expect(response.body).toHaveLength(helper.initialBlogs.length);
 });
+
+test("id property is correctly formatted", async () => {
+  const response = await api.get("/api/blogs");
+  for (let blog of response.body) {
+    expect(blog.id).toBeDefined();
+  }
+});
+
+test.only("likes property defaults to 0 if not defined", async () => {
+  await api
+    .post("/api/blogs")
+    .send(helper.blogWithoutLikes)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+});
+
+afterAll(async () => {
+  await mongoose.connection.close();
+});
