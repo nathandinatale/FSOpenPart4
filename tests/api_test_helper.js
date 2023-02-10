@@ -39,10 +39,11 @@ const initialBlogs = [
   },
 ];
 
-const blogWithoutLikes = {
-  title: "Gambling ads are out of control",
-  author: "James Duthie",
-  url: "https://www.tsn.ca/nhl",
+const blogToAdd = {
+  title: "How does Matt Muray keep getting injured",
+  author: "Sheldon Keefe",
+  url: "https://www.nhl.com/mapleleafs",
+  likes: 10,
 };
 
 const blogsInDb = async () => {
@@ -52,6 +53,6 @@ const blogsInDb = async () => {
 
 module.exports = {
   initialBlogs,
-  blogWithoutLikes,
+  blogToAdd,
   blogsInDb,
 };
