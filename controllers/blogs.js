@@ -6,7 +6,7 @@ blogsRouter.get("/", async (request, response) => {
   response.json(blogs);
 });
 
-blogsRouter.post("/", (request, response) => {
+blogsRouter.post("/", async (request, response, next) => {
   const body = request.body;
   if (!body.title || !body.author || !body.url)
     return response.status(400).send({ error: "Incomplete request" });
@@ -18,11 +18,12 @@ blogsRouter.post("/", (request, response) => {
     likes: body.likes || 0,
   });
 
-  console.log(blog);
-
-  blog.save().then((savedBlog) => {
+  try {
+    const savedBlog = await blog.save();
     response.status(201).json(savedBlog);
-  });
+  } catch (exception) {
+    next(exception);
+  }
 });
 
 module.exports = blogsRouter;
