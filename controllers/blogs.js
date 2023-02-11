@@ -26,4 +26,44 @@ blogsRouter.post("/", async (request, response, next) => {
   }
 });
 
+blogsRouter.delete("/:id", async (request, response, next) => {
+  // findByIdAndRemove doesn't throw an error if ID is valid format and element not found
+  try {
+    const deletedBlog = await Blog.findByIdAndRemove(request.params.id);
+    if (!deletedBlog) throw new MissingIdError("That blog does not exist!");
+    response.status(204).end();
+  } catch (exception) {
+    next(exception);
+  }
+});
+
+blogsRouter.put("/:id", async (request, response, next) => {
+  // need to put the "new: true" object in the mongoose function to get the new document
+  try {
+    const { title, author, body, url, likes } = request.body;
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      request.params.id,
+      {
+        title,
+        author,
+        body,
+        url,
+        likes,
+      },
+      { new: true }
+    );
+    if (!updatedBlog) throw new MissingIdError("That blog does not exist!");
+    response.json(updatedBlog);
+  } catch (exception) {
+    next(exception);
+  }
+});
+
+class MissingIdError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
 module.exports = blogsRouter;
