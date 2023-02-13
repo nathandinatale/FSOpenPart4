@@ -1,5 +1,6 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
+const errors = require("../utils/errors");
 
 blogsRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({});
@@ -30,7 +31,8 @@ blogsRouter.delete("/:id", async (request, response, next) => {
   // findByIdAndRemove doesn't throw an error if ID is valid format and element not found
   try {
     const deletedBlog = await Blog.findByIdAndRemove(request.params.id);
-    if (!deletedBlog) throw new MissingIdError("That blog does not exist!");
+    if (!deletedBlog)
+      throw new errors.MissingIdError("That blog does not exist!");
     response.status(204).end();
   } catch (exception) {
     next(exception);
@@ -52,18 +54,12 @@ blogsRouter.put("/:id", async (request, response, next) => {
       },
       { new: true }
     );
-    if (!updatedBlog) throw new MissingIdError("That blog does not exist!");
+    if (!updatedBlog)
+      throw new errors.MissingIdError("That blog does not exist!");
     response.json(updatedBlog);
   } catch (exception) {
     next(exception);
   }
 });
-
-class MissingIdError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "ValidationError";
-  }
-}
 
 module.exports = blogsRouter;
