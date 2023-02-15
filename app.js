@@ -8,6 +8,7 @@ const logger = require("./utils/logger");
 const middleware = require("./utils/middleware");
 const blogsRouter = require("./controllers/blogs");
 const usersRouter = require("./controllers/users");
+const loginRouter = require("./controllers/login");
 
 mongoose.set("strictQuery", false);
 mongoose
@@ -24,20 +25,21 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
-
-app.use("/api/blogs", blogsRouter);
+app.use(middleware.tokenExtractor);
+app.use("/api/blogs", middleware.userExtractor, blogsRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/login", loginRouter);
 app.use(middleware.errorHandler);
 
 process.on("SIGINT", () => {
   mongoose.connection
     .close()
     .then(() => {
-      console.log("Mongoose connection closed");
+      logger.info("Mongoose connection closed");
       process.exit();
     })
     .catch((error) => {
-      console.log("issue when closing mongoose connection", error);
+      logger.error("issue when closing mongoose connection", error);
       process.exit();
     });
 });

@@ -1,6 +1,5 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
-const User = require("../models/user");
 const errors = require("../utils/errors");
 
 blogsRouter.get("/", async (request, response) => {
@@ -13,7 +12,7 @@ blogsRouter.post("/", async (request, response, next) => {
   if (!body.title || !body.author || !body.url)
     return response.status(400).send({ error: "Incomplete request" });
 
-  const user = await User.findOne();
+  const user = request.user;
 
   const blog = new Blog({
     title: body.title,
@@ -36,9 +35,18 @@ blogsRouter.post("/", async (request, response, next) => {
 blogsRouter.delete("/:id", async (request, response, next) => {
   // findByIdAndRemove doesn't throw an error if ID is valid format and element not found
   try {
-    const deletedBlog = await Blog.findByIdAndRemove(request.params.id);
-    if (!deletedBlog)
-      throw new errors.MissingIdError("That blog does not exist!");
+    const blog = await Blog.findById(request.params.id);
+
+    if (!blog) throw new errors.MissingIdError("That blog does not exist!");
+
+    const user = request.user;
+
+    if (user._id.toString() !== blog.user._id.toString())
+      return response
+        .status(401)
+        .send({ error: "This user is not authorized to delete this blog!" });
+
+    await Blog.findByIdAndRemove(request.params.id);
     response.status(204).end();
   } catch (exception) {
     next(exception);
