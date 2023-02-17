@@ -3,17 +3,22 @@ const jwt = require("jsonwebtoken");
 
 const loginRouter = require("express").Router();
 const User = require("../models/user");
-const logger = require("../utils/logger");
 const config = require("../utils/config");
 
 loginRouter.post("/", async (request, response) => {
   const { username, password } = request.body;
 
   const user = await User.findOne({ username });
-  if (!user) return logger.error("User not found");
+  if (!user)
+    return response
+      .status(401)
+      .send({ error: "Incorrect username or password" });
 
   const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
-  if (!isPasswordCorrect) return logger.error("Incorrect password");
+  if (!isPasswordCorrect)
+    return response
+      .status(401)
+      .send({ error: "Incorrect username or password" });
 
   const userForToken = {
     username: user.username,
