@@ -3,7 +3,6 @@ const Blog = require("../models/blog");
 const User = require("../models/user");
 
 testingRouter.post("/reset", async (request, response) => {
-  console.log(process.env.NODE_ENV);
   if (process.env.NODE_ENV !== "test") return response.status(400).end();
   await Blog.deleteMany({});
   await User.deleteMany({});
