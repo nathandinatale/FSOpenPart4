@@ -67,7 +67,7 @@ blogsRouter.put("/:id", async (request, response, next) => {
         likes,
       },
       { new: true }
-    );
+    ).populate("user", { username: 1, name: 1 });
     if (!updatedBlog)
       throw new errors.MissingIdError("That blog does not exist!");
     response.json(updatedBlog);
